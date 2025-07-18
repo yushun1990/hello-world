@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use anyhow::Context;
 use axum::{Json, Router, http::StatusCode, response::IntoResponse, routing::get};
 use serde::Serialize;
@@ -36,10 +34,6 @@ impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         (StatusCode::INTERNAL_SERVER_ERROR, self.0.to_string()).into_response()
     }
-}
-
-async fn hello() -> &'static str {
-    "Hello World"
 }
 
 async fn hello_json() -> Result<(StatusCode, Json<Response>), AppError> {
