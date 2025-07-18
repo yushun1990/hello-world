@@ -1,0 +1,17 @@
+[workspace]
+resovler = "2"
+members = ["hello_main", "cli_app"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+
+[workspace.dependencies]
+axum = "0.7"
+tokio = "1.35"
+serde = "1.0"
+serde_json = "1.0"
+anyhow = "1.0"
+rand = "0.9"
+tower-http = "0.6"
+clap = "4.0"
