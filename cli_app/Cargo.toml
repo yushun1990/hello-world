@@ -8,7 +8,12 @@ clap.workspace = true
 anyhow.workspace = true
 config.workspace = true
 dotenv.workspace = true
+axum.workspace = true
 
 [dependencies.serde]
 workspace = true
 features = ["derive"]
+
+[dependencies.tokio]
+workspace = true
+features = ["full"]

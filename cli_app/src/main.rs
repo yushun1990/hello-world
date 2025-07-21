@@ -20,20 +20,7 @@ fn main() -> anyhow::Result<()> {
 
     let settings = settings::Settings::new(config_location, "APP")?;
 
-    println!(
-        "db url: {}",
-        settings
-            .database
-            .url
-            .unwrap_or("missing databse url".to_string())
-    );
-
-    println!(
-        "log level: {}",
-        settings.logging.log_level.unwrap_or("info".to_string())
-    );
-
-    commands::handle(&matches)?;
+    commands::handle(&matches, &settings)?;
 
     Ok(())
 }
