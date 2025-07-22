@@ -1,7 +1,26 @@
-use axum::{routing::get, Router};
+use std::sync::Arc;
 
-use super::handlers;
+use axum::{
+    Router,
+    routing::{delete, get, post, put},
+};
 
-pub fn configure() -> Router {
-    Router::new().route("/hello", get(handlers::hello))
+use crate::state::ApplicationState;
+
+use super::handlers::{self};
+
+pub fn configure(state: Arc<ApplicationState>) -> Router {
+    Router::new()
+        .route("/hello", get(handlers::hello).with_state(state.clone()))
+        .route("/posts", post(handlers::create).with_state(state.clone()))
+        .route("/posts", get(handlers::list).with_state(state.clone()))
+        .route("/posts/:id", get(handlers::get).with_state(state.clone()))
+        .route(
+            "/posts/:id",
+            put(handlers::update).with_state(state.clone()),
+        )
+        .route(
+            "/posts/:id",
+            delete(handlers::delete).with_state(state.clone()),
+        )
 }

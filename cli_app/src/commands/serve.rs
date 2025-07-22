@@ -1,8 +1,14 @@
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
 
-use clap::{value_parser, Arg, ArgMatches, Command};
+use clap::{Arg, ArgMatches, Command, value_parser};
+use tower_http::trace::TraceLayer;
+use tracing::{Level, level_filters::LevelFilter};
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::{api, settings::Settings};
+use crate::{api, settings::Settings, state::ApplicationState};
 
 pub const COMMAND_NAME: &'static str = "serve";
 
@@ -26,17 +32,20 @@ pub fn handle(matches: &ArgMatches, settings: &Settings) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn start_tokio(port: u16, _settings: &Settings) -> anyhow::Result<()> {
+fn start_tokio(port: u16, settings: &Settings) -> anyhow::Result<()> {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()?
         .block_on(async move {
-            let addr = SocketAddr::new(
-                IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
-                port
-            );
+            let subscriber = tracing_subscriber::registry()
+                .with(LevelFilter::from_level(Level::TRACE))
+                .with(fmt::Layer::default());
+            subscriber.init();
 
-            let router = api::configure();
+            let state = Arc::new(ApplicationState::new(settings)?);
+            let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+
+            let router = api::configure(state).layer(TraceLayer::new_for_http());
 
             let listener = tokio::net::TcpListener::bind(addr).await?;
             axum::serve(listener, router.into_make_service()).await?;

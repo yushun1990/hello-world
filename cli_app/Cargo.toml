@@ -9,6 +9,22 @@ anyhow.workspace = true
 config.workspace = true
 dotenv.workspace = true
 axum.workspace = true
+arc-swap.workspace = true
+tracing-log.workspace = true
+chrono = { workspace = true, features = ["serde"] }
+
+[dependencies.tower-http]
+workspace = true
+features = ["trace"]
+
+[dependencies.tracing-subscriber]
+workspace = true
+features = ["registry", "env-filter"]
+
+[dependencies.tracing]
+workspace = true
+features = ["log"]
+
 
 [dependencies.serde]
 workspace = true
